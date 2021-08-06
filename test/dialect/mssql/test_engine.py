@@ -202,6 +202,26 @@ class ParseConnectTest(fixtures.TestBase):
             connection,
         )
 
+    def test_pyodbc_odbc_connect_special_chars(self):
+        
+        dialect = pyodbc.dialect()
+        u = url.make_url(
+            "mssql:///?odbc_connect=DRIVER%3D%7BSQL+Server"
+            "%7D%3BServer%3Dhostspec%3BDatabase%3Ddatabase"
+            "%3BUID%3Dusername%3BPWD%3DC5IXvyuqfbMCyFuScdH7i%d4AYsJr_LH"
+        )
+        connection = dialect.create_connect_args(u)
+        eq_(
+            [
+                [
+                    "DRIVER={SQL Server};Server=hostspec;Database=database;UI"
+                    "D=username;PWD=C5IXvyuqfbMCyFuScdH7i%d4AYsJr_LH"
+                ],
+                {},
+            ],
+            connection,
+        )
+
     def test_pyodbc_odbc_connect_with_dsn(self):
         dialect = pyodbc.dialect()
         u = url.make_url(
